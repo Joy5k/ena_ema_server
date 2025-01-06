@@ -1,0 +1,20 @@
+# Ignore environment files
+.env
+
+# Ignore build output directory
+dist/
+
+# Ignore Node.js modules directory
+node_modules/
+playground-1.mongodb.js
+
+
+
+
+
+
+
+
+
+
+.vercel
