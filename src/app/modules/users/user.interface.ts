@@ -1,5 +1,5 @@
-import { Model, Types } from 'mongoose';
-import { USER_ROLE, USER_STATUS } from './../../../shared/type';
+import { Model } from 'mongoose';
+import { USER_ROLE, } from './../../../shared/type';
 
 
 export type TUser={

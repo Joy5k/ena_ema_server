@@ -2,16 +2,15 @@ import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { userServices } from "./user.services";
-import { AuthServices } from "../auth/auth.services";
 import { Request, Response } from "express";
 import { tokenDecoded } from "../../../shared/userAuth";
 import CustomError from "../../error/customError";
-import { JwtPayload } from "jsonwebtoken";
 import { jwtHelpers } from "../../helpers/jwtHelpers";
 import config from "../../config";
 
 const createAdmin=catchAsync(async(req:Request,res:Response)=>{
     const token=req.headers.authorization
+    
     const id=req.body
     if(!token){
         throw new CustomError(httpStatus.UNAUTHORIZED,"Unauthorized access")
