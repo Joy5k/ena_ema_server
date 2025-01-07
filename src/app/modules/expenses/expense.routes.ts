@@ -6,13 +6,14 @@ import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
-router.post('/create', validateRequest(expenseValidationSchema.expenseValidationSchemaZod
-),  expenseController.createExpense)
-router.put('/update/:id', validateRequest(expenseValidationSchema.expenseValidationSchemaZod), expenseController.updateExpense);
+router.post('/tasks', validateRequest(expenseValidationSchema.expenseValidationSchemaZod
+), expenseController.createExpense)
 
-router.delete('/delete/:id',  expenseController.deleteExpense);
+router.get('/tasks', expenseController.getExpenses);
+router.put('/tasks/:id', validateRequest(expenseValidationSchema.expenseValidationSchemaZod), expenseController.updateExpense);
 
-router.get('/get-all', expenseController.getExpenses);
+router.delete('/tasks/:id',  expenseController.deleteExpense);
+
 
 // monthly limitation routes start here
 router.post("/limit-create", validateRequest(expenseValidationSchema.monthlyLimitValidationSchemaZod), expenseController.createMonthlyLimit)
