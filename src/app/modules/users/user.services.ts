@@ -17,11 +17,9 @@ const createAdminIntoDB = async (_id: string) => {
   
   
     //   Uncomment this section if you want to update the user's role
-      const newStatus = isExistUser.role === "admin" ? "user" : "admin";
   
       const result = await Users.updateOne(
         { _id, status: "active" },
-        { $set: { role: newStatus } },
         {new:true}
       ).select('-password');
       return result;
@@ -71,11 +69,9 @@ const changeRoleUserToSellerIntoDB=async(_id:string)=>{
 
 
   //   Uncomment this section if you want to update the user's role
-    const newStatus = isExistUser.role === "user" ? "seller" : "user";
 
     const result = await Users.updateOne(
       { _id, status: "active" },
-      { $set: { role: newStatus } },
       {new:true}
     ).select('-password');
     return result;
@@ -102,12 +98,10 @@ const blockUserIntoDB = async ( _id: string) => {
       }
   
       // Toggle the status
-      const newStatus = user.status === "active" ? "blocked" : "active";
   
       // Update the user with the new status
       const result = await Users.findByIdAndUpdate(
         _id,
-        { status: newStatus },
         { new: true } // Return the updated document
       ).select(['-password','-secret']);
   
