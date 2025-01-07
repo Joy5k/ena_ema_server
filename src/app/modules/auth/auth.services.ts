@@ -11,12 +11,11 @@ import config from "../../config";
 import { Users } from "../users/user.model";
 import CustomError from "../../error/customError";
 import { TRegister } from './auth.interface';
-import speakeasy from 'speakeasy';
-import qrcode from 'qrcode';
+
 
 const loginUser = async (payload: { email: string; password: string }) => {
   const userData=await Users.findOne({email:payload.email})
-
+  console.log(userData,payload)
 if(!userData){
    throw new CustomError(httpStatus.NOT_FOUND,"User is not available")
 }
@@ -30,7 +29,7 @@ if(!userData){
   const accessToken = jwtHelpers.generateToken(
     {
       email: userData.email,
-      userId: userData?.id,
+      userId: userData?._id,
     },
     config.jwt.jwt_access_secret as Secret,
     config.jwt.expires_in as string

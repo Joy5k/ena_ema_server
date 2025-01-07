@@ -1,7 +1,6 @@
 // backend/models/Expense.js
 import  { model, Schema } from 'mongoose';
 import { IExpense } from './expense.interface';
-import { string } from 'zod';
 
 const expenseSchema = new Schema<IExpense>({
   category: { type: String, required: true },
