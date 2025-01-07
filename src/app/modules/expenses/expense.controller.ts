@@ -11,7 +11,6 @@ const createExpense=catchAsync(async(req,res)=>{
     const payload=req.body
 
     const authToken =req.headers.authorization
-    console.log(authToken)
 
     if(!authToken){
         throw new CustomError(httpStatus.UNAUTHORIZED,"unauthorize access")
@@ -22,7 +21,6 @@ const createExpense=catchAsync(async(req,res)=>{
         email,
 
     }
-    console.log(expensesData)
     const result= await expenseServices.createExpenseIntoDB(expensesData)
     sendResponse(res,{
         statusCode:httpStatus.CREATED,
@@ -33,7 +31,67 @@ const createExpense=catchAsync(async(req,res)=>{
 })
 
 
+const updateExpense = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const payload = req.body;
+    const authToken = req.headers.authorization;
 
+    if (!authToken) {
+        throw new CustomError(httpStatus.UNAUTHORIZED, "unauthorized access");
+    }
+
+    const { email } = jwtHelpers.verifyToken(authToken, config.jwt.jwt_access_secret as string) as { email: string, id: string };
+
+    const updatedExpenseData = {
+        ...payload,
+        email,
+    };
+
+    const result = await expenseServices.updateExpenseInDB(id, updatedExpenseData);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Expense record updated successfully",
+        data: result,
+    });
+});
+
+const getExpenses = catchAsync(async (req, res) => {
+    const authToken = req.headers.authorization;
+
+    if (!authToken) {
+        throw new CustomError(httpStatus.UNAUTHORIZED, "unauthorized access");
+    }
+
+    const { email } = jwtHelpers.verifyToken(authToken, config.jwt.jwt_access_secret as string) as { email: string, id: string };
+
+    const result = await expenseServices.getAllExpensesFromDB(email);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Expenses retrieved successfully",
+        data: result,
+    });
+});
+
+const deleteExpense = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const authToken = req.headers.authorization;
+
+    if (!authToken) {
+        throw new CustomError(httpStatus.UNAUTHORIZED, "unauthorized access");
+    }
+
+    const { email } = jwtHelpers.verifyToken(authToken, config.jwt.jwt_access_secret as string) as { email: string, id: string };
+
+    await expenseServices.deleteExpenseFromDB(id);
+    sendResponse(res, {
+        statusCode: httpStatus.NO_CONTENT,
+        success: true,
+        message: "Expense record deleted successfully",
+        data:null
+    });
+});
 
 
 const createMonthlyLimit = catchAsync(async (req, res) => {
@@ -68,5 +126,8 @@ const createMonthlyLimit = catchAsync(async (req, res) => {
 
 export const expenseController={
     createExpense,
+    getExpenses,
+    updateExpense,
+    deleteExpense,
     createMonthlyLimit
 }
