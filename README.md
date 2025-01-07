@@ -3,6 +3,7 @@
 # Ena_ema Server with MongoDB
 
 ## you can use the database with [this URL](https://ena-ema-server-theta.vercel.app/) free! just using the url
+URL: https://ena-ema-server-theta.vercel.app/
 
 ## Setup
 
