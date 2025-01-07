@@ -33,6 +33,40 @@ const createExpense=catchAsync(async(req,res)=>{
 })
 
 
+
+
+
+const createMonthlyLimit = catchAsync(async (req, res) => {
+    const {  spendingLimits } = req.body;
+    const authToken = req.headers.authorization;
+    console.log(authToken);
+
+    if (!authToken) {
+        throw new CustomError(httpStatus.UNAUTHORIZED, "unauthorized access");
+    }
+
+    const { email } = jwtHelpers.verifyToken(authToken, config.jwt.jwt_access_secret as string) as { email: string, id: string };
+
+   
+
+    const monthlyLimit = (Object.values(spendingLimits) as number[]).reduce((acc: number, limit: number) => acc + limit, 0);
+
+    const monthlyLimitData = {
+        email,
+        monthlyLimit,
+        spendingLimits,
+    };
+
+    const result = await expenseServices.createMonthlyLimitIntoDB(monthlyLimitData);
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: "Monthly limit record saved into database successfully",
+        data: result,
+    });
+});
+
 export const expenseController={
-    createExpense
+    createExpense,
+    createMonthlyLimit
 }

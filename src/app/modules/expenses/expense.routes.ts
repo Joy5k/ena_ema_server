@@ -9,4 +9,7 @@ const router = express.Router();
 router.post('/create', validateRequest(expenseValidationSchema.expenseValidationSchemaZod
 ),  expenseController.createExpense)
 
+
+// monthly limitation routes start here
+router.post("/limit-create", validateRequest(expenseValidationSchema.monthlyLimitValidationSchemaZod), expenseController.createMonthlyLimit)
 export const expenseRoutes=router

@@ -1,4 +1,5 @@
-import { Expense } from "./expense.model"
+import { IMonthlyLimit } from "./expense.interface"
+import { Expense, MonthlyLimit } from "./expense.model"
 
 const createExpenseIntoDB=async(payload:any)=>{
 
@@ -7,6 +8,24 @@ const createExpenseIntoDB=async(payload:any)=>{
 }
 
 
+
+// monthlyLimit services 
+
+const createMonthlyLimitIntoDB=async(payload:IMonthlyLimit)=>{
+    const result= await MonthlyLimit.create(payload)
+    return result
+}
+
+
+
+
+
+
+
+
+
 export const expenseServices={
-    createExpenseIntoDB
+    createExpenseIntoDB,
+
+    createMonthlyLimitIntoDB
 }
