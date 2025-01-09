@@ -8,13 +8,9 @@ export interface IExpense{
 
 export interface IMonthlyLimit {
     email: string;
-    monthlyLimit?: number;
-    spendingLimits: {
-        Groceries: number;
-        Transportation: number;
-        Healthcare: number;
-        Utility: number;
-        Charity: number;
-        Miscellaneous: number;
-    };
+  monthlyLimit?: number;
+  spendingLimits: Array<{
+    category: string;
+    amount: number;
+  }>;
 }

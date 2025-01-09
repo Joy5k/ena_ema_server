@@ -17,21 +17,26 @@ export const Expense = model<IExpense>('Expense', expenseSchema);
 const monthlySchema = new Schema<IMonthlyLimit>({
   email: {
     type: String,
-    required: true
+    required: true,
   },
   // Monthly spending limit
   monthlyLimit: {
     type: Number,
   },
-  // Spending limits for each category
-  spendingLimits: {
-    Groceries: { type: Number, default: 0 },
-    Transportation: { type: Number, default: 0 },
-    Healthcare: { type: Number, default: 0 },
-    Utility: { type: Number, default: 0 },
-    Charity: { type: Number, default: 0 },
-    Miscellaneous: { type: Number, default: 0 },
-  }
+  // Spending limits for each category (dynamic list)
+  spendingLimits: [
+    {
+      category: {
+        type: String,
+        required: true,
+      },
+      amount: {
+        type: Number,
+        required: true,
+        default: 0,
+      },
+    },
+  ],
 });
 
 export const MonthlyLimit = model<IMonthlyLimit>('MonthlyLimit', monthlySchema);

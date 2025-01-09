@@ -10,22 +10,32 @@ const expenseValidationSchemaZod = z.object({
     purpose:z.string(),
    })
 });
-
-const monthlyLimitValidationSchemaZod = z.object({
-   body:z.object({
+const expenseUpdateValidationSchemaZod = z.object({
+   body: z.object({
       email: z.string().email().optional(),
-   monthlyLimit: z.number().positive().optional(),
-   spendingLimits: z.object({
-      Groceries: z.number().positive(),
-      Transportation: z.number().positive(),
-      Healthcare: z.number().positive(),
-      Utility: z.number().positive(),
-      Charity: z.number().positive(),
-      Miscellaneous: z.number().positive(),
+      categories: z.array(z.object({
+         category: z.enum(['Groceries', 'Transportation', 'Healthcare', 'Utility', 'Charity', 'Miscellaneous']),
+         amount: z.number().positive(),
+      })),
    }),
-   })
 });
 
+const monthlyLimitValidationSchemaZod = z.object({
+   body: z.object({
+     email: z.string().email().optional(),
+     monthlyLimit: z.number().positive().optional(),
+     spendingLimits: z.array(
+       z.object({
+         category: z.string(), // Validate category as a string
+         amount: z.number().positive(), // Validate amount as a positive number
+       })
+     ),
+   }),
+ });
 
 
-export const expenseValidationSchema= { expenseValidationSchemaZod,monthlyLimitValidationSchemaZod };
+
+export const expenseValidationSchema= {
+    expenseUpdateValidationSchemaZod,
+   expenseValidationSchemaZod,
+   monthlyLimitValidationSchemaZod };

@@ -7,7 +7,6 @@ import CustomError from "../../error/customError";
 import { tokenDecoded } from "../../../shared/userAuth";
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-    console.log(req.body)
     const result = await AuthServices.loginUser(req.body);
     const { refreshToken } = result;
 

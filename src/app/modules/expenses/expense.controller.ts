@@ -8,10 +8,13 @@ import config from "../../config";
 
 
 const createExpense=catchAsync(async(req,res)=>{
-    const payload=req.body
-
-    const authToken =req.headers.authorization
-
+    const payload = { ...req.body, amount: Number(req.body.amount) }
+    const authToken = req.headers.authorization;
+    if (!authToken) {
+        console.error("Authorization header is missing");
+    } else {
+        console.log("Authorization header:", authToken);
+    }
     if(!authToken){
         throw new CustomError(httpStatus.UNAUTHORIZED,"unauthorize access")
     }
@@ -32,7 +35,7 @@ const createExpense=catchAsync(async(req,res)=>{
 
 
 const updateExpense = catchAsync(async (req, res) => {
-    const { id } = req.params;
+    const date = req.params.id as string;
     const payload = req.body;
     const authToken = req.headers.authorization;
 
@@ -42,12 +45,8 @@ const updateExpense = catchAsync(async (req, res) => {
 
     const { email } = jwtHelpers.verifyToken(authToken, config.jwt.jwt_access_secret as string) as { email: string, id: string };
 
-    const updatedExpenseData = {
-        ...payload,
-        email,
-    };
 
-    const result = await expenseServices.updateExpenseInDB(id, updatedExpenseData);
+    const result = await expenseServices.updateExpenseInDB(email,date, payload);
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -63,13 +62,29 @@ const getExpenses = catchAsync(async (req, res) => {
         throw new CustomError(httpStatus.UNAUTHORIZED, "unauthorized access");
     }
 
-    const { email } = jwtHelpers.verifyToken(authToken, config.jwt.jwt_access_secret as string) as { email: string, id: string };
-
-    const result = await expenseServices.getAllExpensesFromDB(email);
+    const result = await expenseServices.getAllExpensesFromDB();
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: "Expenses retrieved successfully",
+        data: result,
+    });
+});
+const getDailyExpenses = catchAsync(async (req, res) => {
+    const params=req.query.filter as string
+    const authToken = req.headers.authorization;
+    console.log(params)
+    if (!authToken) {
+        throw new CustomError(httpStatus.UNAUTHORIZED, "unauthorized access");
+    }
+
+    const { email } = jwtHelpers.verifyToken(authToken, config.jwt.jwt_access_secret as string) as { email: string, id: string };
+
+    const result = await expenseServices.getDailyExpense(email,params);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Daily Expenses retrieved successfully",
         data: result,
     });
 });
@@ -97,7 +112,6 @@ const deleteExpense = catchAsync(async (req, res) => {
 const createMonthlyLimit = catchAsync(async (req, res) => {
     const {  spendingLimits } = req.body;
     const authToken = req.headers.authorization;
-    console.log(authToken);
 
     if (!authToken) {
         throw new CustomError(httpStatus.UNAUTHORIZED, "unauthorized access");
@@ -107,14 +121,14 @@ const createMonthlyLimit = catchAsync(async (req, res) => {
 
    
 
-    const monthlyLimit = (Object.values(spendingLimits) as number[]).reduce((acc: number, limit: number) => acc + limit, 0);
+    const monthlyLimit = spendingLimits.reduce((acc: number, limit: any) => acc + Number(limit.amount), 0);
 
     const monthlyLimitData = {
         email,
         monthlyLimit,
         spendingLimits,
     };
-
+console.log(monthlyLimit)
     const result = await expenseServices.createMonthlyLimitIntoDB(monthlyLimitData);
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
@@ -127,6 +141,7 @@ const createMonthlyLimit = catchAsync(async (req, res) => {
 export const expenseController={
     createExpense,
     getExpenses,
+    getDailyExpenses,
     updateExpense,
     deleteExpense,
     createMonthlyLimit
