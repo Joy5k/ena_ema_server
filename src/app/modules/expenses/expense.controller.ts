@@ -8,13 +8,12 @@ import config from "../../config";
 
 
 const createExpense=catchAsync(async(req,res)=>{
-    const payload = { ...req.body, amount: Number(req.body.amount) }
-    const authToken = req.headers.authorization;
-    if (!authToken) {
-        console.error("Authorization header is missing");
-    } else {
-        console.log("Authorization header:", authToken);
+    const payload = { ...req.body, amount: Number(req.body.amount),
+        createdAt: new Date().toISOString(),
+
     }
+    const authToken = req.headers.authorization;
+   
     if(!authToken){
         throw new CustomError(httpStatus.UNAUTHORIZED,"unauthorize access")
     }
@@ -90,7 +89,7 @@ const getDailyExpenses = catchAsync(async (req, res) => {
 });
 
 const deleteExpense = catchAsync(async (req, res) => {
-    const { id } = req.params;
+    const { id:date } = req.params;
     const authToken = req.headers.authorization;
 
     if (!authToken) {
@@ -98,8 +97,11 @@ const deleteExpense = catchAsync(async (req, res) => {
     }
 
     const { email } = jwtHelpers.verifyToken(authToken, config.jwt.jwt_access_secret as string) as { email: string, id: string };
-
-    await expenseServices.deleteExpenseFromDB(id);
+    const payload={
+        date,
+        email
+    }
+    await expenseServices.deleteExpenseFromDB(payload);
     sendResponse(res, {
         statusCode: httpStatus.NO_CONTENT,
         success: true,
@@ -112,7 +114,6 @@ const deleteExpense = catchAsync(async (req, res) => {
 const createMonthlyLimit = catchAsync(async (req, res) => {
     const {  spendingLimits } = req.body;
     const authToken = req.headers.authorization;
-
     if (!authToken) {
         throw new CustomError(httpStatus.UNAUTHORIZED, "unauthorized access");
     }

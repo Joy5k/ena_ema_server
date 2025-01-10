@@ -2,7 +2,38 @@ import { IMonthlyLimit } from "./expense.interface"
 import { Expense, MonthlyLimit } from "./expense.model"
 
 const createExpenseIntoDB = async (payload: any) => {
-    const existingExpense = await Expense.findOne({ email: payload.email, category: payload.category });
+    // Step 1: Fetch the user's monthly limit and spending limits
+    const monthlyLimitData = await MonthlyLimit.findOne({ email: payload.email });
+    if (!monthlyLimitData) {
+        throw new Error("Monthly limit not set for this user.");
+    }
+
+    const { spendingLimits } = monthlyLimitData;
+
+    // Step 2: Check if the category amount exceeds the spending limit
+    const categoryLimit = spendingLimits[payload.category as keyof typeof spendingLimits];
+    if (payload.amount > categoryLimit) {
+        throw new Error(`Amount for ${payload.category} exceeds the spending limit.`);
+    }
+
+    // Step 3: Validate the createdAt field
+    if (!payload.createdAt || isNaN(new Date(payload.createdAt).getTime())) {
+        throw new Error("Invalid or missing date provided for createdAt.");
+    }
+
+    const createdAtDate = new Date(payload.createdAt);
+
+    // Step 4: Check if an expense already exists for the given email, category, and date
+    const startOfDay = new Date(createdAtDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(createdAtDate.setHours(23, 59, 59, 999));
+
+    const existingExpense = await Expense.findOne({
+        email: payload.email,
+        category: payload.category,
+        createdAt: { $gte: startOfDay, $lt: endOfDay }
+    });
+
+    // Step 5: Update the existing expense or create a new one
     if (existingExpense) {
         existingExpense.amount += payload.amount;
         const result = await existingExpense.save();
@@ -11,7 +42,8 @@ const createExpenseIntoDB = async (payload: any) => {
         const result = await Expense.create(payload);
         return result;
     }
-}
+};
+
 
 
 const updateExpenseInDB = async (email: string, date: string, categoriesToUpdate: any) => {
@@ -140,8 +172,14 @@ const getDailyExpense = async (email: string, filterBy: string) => {
     
     return result;
 }
-const deleteExpenseFromDB = async (id: string) => {
-    const result = await Expense.findByIdAndDelete(id);
+const deleteExpenseFromDB = async (payload:{date:string,email:string}) => {
+    console.log(payload)
+    const startOfDay = new Date(new Date(payload.date).setHours(0, 0, 0, 0));
+    const endOfDay = new Date(new Date(payload.date).setHours(23, 59, 59, 999));
+    const result = await Expense.deleteMany({
+        email: payload.email,
+        createdAt: { $gte: startOfDay, $lt: endOfDay }
+    });
     return result;
 }
 
