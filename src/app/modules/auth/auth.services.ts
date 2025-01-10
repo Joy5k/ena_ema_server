@@ -15,7 +15,6 @@ import { TRegister } from './auth.interface';
 
 const loginUser = async (payload: { email: string; password: string }) => {
   const userData=await Users.findOne({email:payload.email})
-  console.log(userData,payload)
 if(!userData){
    throw new CustomError(httpStatus.NOT_FOUND,"User is not available")
 }
@@ -88,7 +87,6 @@ await session.endSession();
 
 return {data:createUser,accessToken,refreshToken}
   } catch (error) {
-    console.log(error);
     await session.abortTransaction();
     await session.endSession();
     throw new CustomError(httpStatus.BAD_REQUEST, 'Failed to Register');

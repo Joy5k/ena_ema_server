@@ -60,7 +60,6 @@ const updateExpense = catchAsync(async (req, res) => {
 const getDailyExpenses = catchAsync(async (req, res) => {
     const params=req.query.filter as string
     const authToken = req.headers.authorization;
-    console.log(params)
     if (!authToken) {
         throw new CustomError(httpStatus.UNAUTHORIZED, "unauthorized access");
     }

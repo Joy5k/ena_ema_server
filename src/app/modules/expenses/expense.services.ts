@@ -47,7 +47,7 @@ const createExpenseIntoDB = async (payload: any) => {
 
         // Check if the new total amount exceeds the category limit
         if (newTotalAmount > categoryLimit) {
-            throw new Error(`Total amount for ${payload.category} exceeds the spending limit.`);
+            throw new Error(`Total amount for ${payload.category} exceeds the spending limit.Your ${payload.category} limitation is ${categoryLimit}`);
         }
 
         // Update the existing expense with the new amount
