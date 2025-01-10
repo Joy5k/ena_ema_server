@@ -8,11 +8,13 @@ import config from "../../config";
 
 
 const createExpense=catchAsync(async(req,res)=>{
+    
+    const authToken = req.headers.authorization;
+
     const payload = { ...req.body, amount: Number(req.body.amount),
         createdAt: new Date().toISOString(),
 
     }
-    const authToken = req.headers.authorization;
    
     if(!authToken){
         throw new CustomError(httpStatus.UNAUTHORIZED,"unauthorize access")
@@ -54,21 +56,7 @@ const updateExpense = catchAsync(async (req, res) => {
     });
 });
 
-const getExpenses = catchAsync(async (req, res) => {
-    const authToken = req.headers.authorization;
 
-    if (!authToken) {
-        throw new CustomError(httpStatus.UNAUTHORIZED, "unauthorized access");
-    }
-
-    const result = await expenseServices.getAllExpensesFromDB();
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Expenses retrieved successfully",
-        data: result,
-    });
-});
 const getDailyExpenses = catchAsync(async (req, res) => {
     const params=req.query.filter as string
     const authToken = req.headers.authorization;
@@ -129,7 +117,6 @@ const createMonthlyLimit = catchAsync(async (req, res) => {
         monthlyLimit,
         spendingLimits,
     };
-console.log(monthlyLimit)
     const result = await expenseServices.createMonthlyLimitIntoDB(monthlyLimitData);
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
@@ -141,7 +128,6 @@ console.log(monthlyLimit)
 
 export const expenseController={
     createExpense,
-    getExpenses,
     getDailyExpenses,
     updateExpense,
     deleteExpense,

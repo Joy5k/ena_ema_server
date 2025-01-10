@@ -12,8 +12,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: ['https://electon-one.vercel.app','http://localhost:3000'],
-    // origin: ['https://electon-one.vercel.app'],
+    origin: ['https://ena-ema-client-one.vercel.app','http://localhost:3000'],
     credentials: true,
   }),
 );
